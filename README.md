@@ -45,6 +45,26 @@ docker compose up -d --build
 - **Frontend**: http://localhost:5173
 - **Backend API**: http://localhost:8080
 
+### Custom Ports
+
+If default ports are already in use, you can configure custom ports:
+
+```bash
+# Change backend port only
+BACKEND_PORT=8081 docker compose up --build -d
+
+# Change frontend port only
+FRONTEND_PORT=3000 docker compose up --build -d
+
+# Change both ports
+BACKEND_PORT=8081 FRONTEND_PORT=3000 docker compose up --build -d
+```
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `BACKEND_PORT` | 8080 | Host port for the backend API |
+| `FRONTEND_PORT` | 5173 | Host port for the frontend UI |
+
 ### Run Tests via Docker
 
 ```bash
@@ -134,6 +154,8 @@ Response: {
 
 ## Configuration
 
+### Pack Sizes
+
 Pack sizes are configured in `backend/configs/packs.json`:
 
 ```json
@@ -148,14 +170,24 @@ To change pack sizes:
 
 No code changes required.
 
-## Environment Variables
+### Environment Variables
 
-### Backend
-- `PORT` - Server port (default: 8080)
-- `PACKS_CONFIG_PATH` - Path to pack sizes config (default: configs/packs.json)
+#### Docker Compose
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `BACKEND_PORT` | 8080 | Host port for backend API |
+| `FRONTEND_PORT` | 5173 | Host port for frontend UI |
 
-### Frontend
-- `VITE_API_BASE_URL` - Backend API URL (default: http://localhost:8080)
+#### Backend Container
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `PORT` | 8080 | Internal server port |
+| `PACKS_CONFIG_PATH` | configs/packs.json | Path to pack sizes config |
+
+#### Frontend Build
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `VITE_API_BASE_URL` | http://localhost:8080 | Backend API URL |
 
 ## Algorithm
 
