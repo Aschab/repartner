@@ -72,7 +72,13 @@ func (h *Handler) handleCalculate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := h.calculator.Calculate(req.OrderQuantity, h.config.PackSizes)
+	// Use pack sizes from request, fall back to config if not provided
+	packSizes := req.PackSizes
+	if len(packSizes) == 0 {
+		packSizes = h.config.PackSizes
+	}
+
+	result, err := h.calculator.Calculate(req.OrderQuantity, packSizes)
 	if err != nil {
 		h.writeJSON(w, http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 		return

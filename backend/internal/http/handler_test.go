@@ -183,3 +183,75 @@ func TestHandler_CORS(t *testing.T) {
 		t.Error("expected CORS header to be set")
 	}
 }
+
+func TestHandler_Calculate_WithCustomPackSizes(t *testing.T) {
+	cfg := &config.Config{PackSizes: []int{250, 500, 1000}}
+	calc := service.NewCalculator()
+	handler := NewHandler(calc, cfg)
+	router := handler.SetupRoutes()
+
+	// Send custom pack sizes in request
+	body := CalculateRequest{
+		OrderQuantity: 10,
+		PackSizes:     []int{3, 5, 9},
+	}
+	jsonBody, _ := json.Marshal(body)
+
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/calculate", bytes.NewReader(jsonBody))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+
+	router.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Errorf("expected status %d, got %d", http.StatusOK, rec.Code)
+	}
+
+	var resp CalculateResponse
+	if err := json.Unmarshal(rec.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("failed to unmarshal response: %v", err)
+	}
+
+	// 10 can be made exactly with 5+5
+	if resp.TotalShipped != 10 {
+		t.Errorf("expected total_shipped 10, got %d", resp.TotalShipped)
+	}
+
+	if resp.TotalPacks != 2 {
+		t.Errorf("expected total_packs 2, got %d", resp.TotalPacks)
+	}
+}
+
+func TestHandler_Calculate_FallbackToConfigPackSizes(t *testing.T) {
+	cfg := &config.Config{PackSizes: []int{250, 500, 1000}}
+	calc := service.NewCalculator()
+	handler := NewHandler(calc, cfg)
+	router := handler.SetupRoutes()
+
+	// Send empty pack sizes - should fall back to config
+	body := CalculateRequest{
+		OrderQuantity: 501,
+		PackSizes:     []int{},
+	}
+	jsonBody, _ := json.Marshal(body)
+
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/calculate", bytes.NewReader(jsonBody))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+
+	router.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Errorf("expected status %d, got %d", http.StatusOK, rec.Code)
+	}
+
+	var resp CalculateResponse
+	if err := json.Unmarshal(rec.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("failed to unmarshal response: %v", err)
+	}
+
+	// Using config pack sizes [250, 500, 1000], 501 should give 750 (500 + 250)
+	if resp.TotalShipped != 750 {
+		t.Errorf("expected total_shipped 750, got %d", resp.TotalShipped)
+	}
+}

@@ -4,6 +4,7 @@ import { CalculationResponse } from './types';
 import { OrderForm } from './components/OrderForm';
 import { ResultCard } from './components/ResultCard';
 import { ErrorBanner } from './components/ErrorBanner';
+import { PackSizesManager } from './components/PackSizesManager';
 
 function App() {
   const [packSizes, setPackSizes] = useState<number[]>([]);
@@ -27,18 +28,40 @@ function App() {
   }, []);
 
   const handleSubmit = async (quantity: number) => {
+    if (packSizes.length === 0) {
+      setError('Please add at least one pack size');
+      return;
+    }
+
     setIsLoading(true);
     setError('');
     setResult(null);
 
     try {
-      const data = await calculateOrder(quantity);
+      const data = await calculateOrder(quantity, packSizes);
       setResult(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Calculation failed');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleAddPackSize = (size: number) => {
+    setPackSizes((prev) => [...prev, size].sort((a, b) => b - a));
+    setResult(null);
+  };
+
+  const handleRemovePackSize = (size: number) => {
+    setPackSizes((prev) => prev.filter((s) => s !== size));
+    setResult(null);
+  };
+
+  const handleUpdatePackSize = (oldSize: number, newSize: number) => {
+    setPackSizes((prev) =>
+      prev.map((s) => (s === oldSize ? newSize : s)).sort((a, b) => b - a)
+    );
+    setResult(null);
   };
 
   return (
@@ -52,16 +75,12 @@ function App() {
         <div className="loading">Loading pack sizes...</div>
       ) : (
         <>
-          <div className="pack-sizes">
-            <h3>Available Pack Sizes</h3>
-            <div className="pack-sizes-list">
-              {packSizes.map((size) => (
-                <span key={size} className="pack-size-badge">
-                  {size.toLocaleString()}
-                </span>
-              ))}
-            </div>
-          </div>
+          <PackSizesManager
+            packSizes={packSizes}
+            onAdd={handleAddPackSize}
+            onRemove={handleRemovePackSize}
+            onUpdate={handleUpdatePackSize}
+          />
 
           <OrderForm onSubmit={handleSubmit} isLoading={isLoading} />
 

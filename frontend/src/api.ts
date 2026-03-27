@@ -13,13 +13,16 @@ export async function getPackSizes(): Promise<PackSizesResponse> {
   return response.json();
 }
 
-export async function calculateOrder(orderQuantity: number): Promise<CalculationResponse> {
+export async function calculateOrder(orderQuantity: number, packSizes: number[]): Promise<CalculationResponse> {
   const response = await fetch(`${API_BASE_URL}/api/v1/calculate`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ order_quantity: orderQuantity }),
+    body: JSON.stringify({
+      order_quantity: orderQuantity,
+      pack_sizes: packSizes,
+    }),
   });
 
   if (!response.ok) {

@@ -32,35 +32,160 @@ body {
   color: #7f8c8d;
 }
 
-.pack-sizes {
+/* Pack Sizes Manager */
+.pack-sizes-manager {
   background: white;
-  padding: 1rem;
+  padding: 1.5rem;
   border-radius: 8px;
   margin-bottom: 1.5rem;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.pack-sizes h3 {
-  font-size: 0.9rem;
-  color: #7f8c8d;
-  margin-bottom: 0.5rem;
+.pack-sizes-manager h3 {
+  font-size: 1rem;
+  color: #2c3e50;
+  margin-bottom: 1rem;
 }
 
-.pack-sizes-list {
+.pack-sizes-manager .pack-sizes-list {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.pack-size-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+
+.pack-size-value {
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.pack-size-actions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.pack-size-actions button,
+.pack-size-edit button {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.btn-edit {
+  background: #e8e8e8;
+  color: #666;
+}
+
+.btn-edit:hover {
+  background: #ddd;
+}
+
+.btn-remove {
+  background: #fee;
+  color: #e74c3c;
+}
+
+.btn-remove:hover:not(:disabled) {
+  background: #fdd;
+}
+
+.btn-remove:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-save {
+  background: #d4edda;
+  color: #28a745;
+}
+
+.btn-save:hover {
+  background: #c3e6cb;
+}
+
+.btn-cancel {
+  background: #f8d7da;
+  color: #dc3545;
+}
+
+.btn-cancel:hover {
+  background: #f5c6cb;
+}
+
+.pack-size-edit {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  width: 100%;
+}
+
+.pack-size-edit input {
+  flex: 1;
+  padding: 0.4rem 0.6rem;
+  border: 2px solid #3498db;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.pack-size-add {
+  display: flex;
   gap: 0.5rem;
 }
 
-.pack-size-badge {
-  background: #3498db;
-  color: white;
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
+.pack-size-add input {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
   font-size: 0.9rem;
-  font-weight: 500;
+  transition: border-color 0.2s;
 }
 
+.pack-size-add input:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+.btn-add {
+  padding: 0.5rem 1rem;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-add:hover {
+  background: #2980b9;
+}
+
+.pack-sizes-error {
+  margin-top: 0.5rem;
+  color: #e74c3c;
+  font-size: 0.85rem;
+}
+
+/* Order Form */
 .order-form {
   background: white;
   padding: 1.5rem;
@@ -125,6 +250,7 @@ body {
   cursor: not-allowed;
 }
 
+/* Error Banner */
 .error-banner {
   background: #fee;
   border: 1px solid #e74c3c;
@@ -134,6 +260,7 @@ body {
   margin-bottom: 1.5rem;
 }
 
+/* Result Card */
 .result-card {
   background: white;
   padding: 1.5rem;
@@ -202,6 +329,7 @@ body {
   font-weight: 600;
 }
 
+/* Loading */
 .loading {
   text-align: center;
   padding: 2rem;
