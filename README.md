@@ -60,10 +60,10 @@ FRONTEND_PORT=3000 docker compose up --build -d
 BACKEND_PORT=8081 FRONTEND_PORT=3000 docker compose up --build -d
 ```
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `BACKEND_PORT` | 8080 | Host port for the backend API |
-| `FRONTEND_PORT` | 5173 | Host port for the frontend UI |
+| Variable        | Default | Description                   |
+| --------------- | ------- | ----------------------------- |
+| `BACKEND_PORT`  | 8080    | Host port for the backend API |
+| `FRONTEND_PORT` | 5173    | Host port for the frontend UI |
 
 ### Run Tests via Docker
 
@@ -87,6 +87,7 @@ docker compose down
 ## Local Development (Without Docker)
 
 **Backend:**
+
 ```bash
 cd backend
 go mod download        # Install dependencies
@@ -95,6 +96,7 @@ go run ./cmd/api       # Start server on :8080
 ```
 
 **Frontend:**
+
 ```bash
 cd frontend
 npm install            # Install dependencies
@@ -105,18 +107,21 @@ npm run dev            # Start dev server on :5173
 ## API Reference
 
 ### Health Check
+
 ```
 GET /health
 Response: { "status": "ok" }
 ```
 
 ### Get Pack Sizes
+
 ```
 GET /api/v1/packs
 Response: { "pack_sizes": [250, 500, 1000, 2000, 5000] }
 ```
 
 ### Calculate Packs
+
 ```
 POST /api/v1/calculate
 Content-Type: application/json
@@ -135,6 +140,7 @@ Response: {
 ```
 
 ### Error Response
+
 ```json
 {
   "error": "order_quantity must be greater than 0"
@@ -143,14 +149,14 @@ Response: {
 
 ## Examples
 
-| Order Qty | Total Shipped | Packs |
-|-----------|---------------|-------|
-| 1 | 250 | 1 × 250 |
-| 250 | 250 | 1 × 250 |
-| 251 | 500 | 1 × 500 |
-| 501 | 750 | 1 × 500, 1 × 250 |
-| 12001 | 12250 | 2 × 5000, 1 × 2000, 1 × 250 |
-| 500000 | 500000 | 9429 × 53, 7 × 31, 2 × 23 (with pack sizes [23, 31, 53]) |
+| Order Qty | Total Shipped | Packs                                                    |
+| --------- | ------------- | -------------------------------------------------------- |
+| 1         | 250           | 1 × 250                                                  |
+| 250       | 250           | 1 × 250                                                  |
+| 251       | 500           | 1 × 500                                                  |
+| 501       | 750           | 1 × 500, 1 × 250                                         |
+| 12001     | 12250         | 2 × 5000, 1 × 2000, 1 × 250                              |
+| 500000    | 500000        | 9429 × 53, 7 × 31, 2 × 23 (with pack sizes [23, 31, 53]) |
 
 ## Configuration
 
@@ -165,6 +171,7 @@ Pack sizes are configured in `backend/configs/packs.json`:
 ```
 
 To change pack sizes:
+
 1. Edit the JSON file
 2. Restart the backend service
 
@@ -173,20 +180,23 @@ No code changes required.
 ### Environment Variables
 
 #### Docker Compose
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `BACKEND_PORT` | 8080 | Host port for backend API |
-| `FRONTEND_PORT` | 5173 | Host port for frontend UI |
+
+| Variable        | Default | Description               |
+| --------------- | ------- | ------------------------- |
+| `BACKEND_PORT`  | 8080    | Host port for backend API |
+| `FRONTEND_PORT` | 5173    | Host port for frontend UI |
 
 #### Backend Container
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `PORT` | 8080 | Internal server port |
+
+| Variable            | Default            | Description               |
+| ------------------- | ------------------ | ------------------------- |
+| `PORT`              | 8080               | Internal server port      |
 | `PACKS_CONFIG_PATH` | configs/packs.json | Path to pack sizes config |
 
 #### Frontend Build
-| Variable | Default | Description |
-|----------|---------|-------------|
+
+| Variable            | Default               | Description     |
+| ------------------- | --------------------- | --------------- |
 | `VITE_API_BASE_URL` | http://localhost:8080 | Backend API URL |
 
 ## Algorithm
@@ -209,10 +219,38 @@ This guarantees optimal solutions for any pack size configuration, unlike greedy
 ## Deployment
 
 ### Production URLs
+
 - Frontend: [TBD]
 - Backend API: [TBD]
 
-### Deploy to Cloud
+### Deploy to Railway
+
+1. **Push to GitHub**
+
+   ```bash
+   git add .
+   git commit -m "Ready for deployment"
+   git push origin main
+   ```
+
+2. **Deploy Backend**
+
+   - Go to [railway.app](https://railway.app)
+   - New Project → Deploy from GitHub Repo
+   - Select your repo, set root directory to `backend`
+   - Railway auto-detects the Dockerfile
+   - Note the generated URL (e.g., `https://your-backend.railway.app`)
+
+3. **Deploy Frontend**
+
+   - In the same Railway project, click "New Service"
+   - Deploy from GitHub, set root directory to `frontend`
+   - Add environment variable: `VITE_API_BASE_URL=https://your-backend.railway.app`
+   - Deploy
+
+4. **Update URLs in README** with your deployed URLs
+
+### Deploy to Other Platforms
 
 The Docker images can be deployed to any container platform:
 
