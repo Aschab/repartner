@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"os"
 
 	"pack-calculator/internal/config"
 	"pack-calculator/internal/service"
@@ -27,12 +28,33 @@ func NewHandler(calc service.Calculator, cfg *config.Config) *Handler {
 func (h *Handler) SetupRoutes() http.Handler {
 	mux := http.NewServeMux()
 
-	// Wrap with CORS middleware
+	// API routes
 	mux.HandleFunc("GET /health", h.handleHealth)
 	mux.HandleFunc("GET /api/v1/packs", h.handleGetPacks)
 	mux.HandleFunc("POST /api/v1/calculate", h.handleCalculate)
 
+	// Serve static files (frontend) - check if static dir exists
+	staticDir := "static"
+	if _, err := os.Stat(staticDir); err == nil {
+		fs := http.FileServer(http.Dir(staticDir))
+		mux.Handle("/", h.spaHandler(fs, staticDir))
+	}
+
 	return h.corsMiddleware(h.loggingMiddleware(mux))
+}
+
+// spaHandler wraps file server to handle SPA routing (serve index.html for unknown routes)
+func (h *Handler) spaHandler(fs http.Handler, staticDir string) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		path := staticDir + r.URL.Path
+		// Check if file exists
+		if _, err := os.Stat(path); os.IsNotExist(err) {
+			// Serve index.html for SPA routing
+			http.ServeFile(w, r, staticDir+"/index.html")
+			return
+		}
+		fs.ServeHTTP(w, r)
+	})
 }
 
 func (h *Handler) corsMiddleware(next http.Handler) http.Handler {
